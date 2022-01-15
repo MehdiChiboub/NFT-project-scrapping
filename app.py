@@ -62,3 +62,39 @@ for ele in top_data:
 # insert into MongoDB
 collection1.insert_many(recentData)
 collection2.insert_many(topData)
+
+
+collection = db["all-collections"]
+
+
+dbData = []
+dbDataElement = {}
+
+# All Collections
+for i in recent_data[1].find_elements_by_tag_name("tr"):
+    if index == 0:
+        index = index + 1
+        continue
+
+    onLine = []
+    attributes = ["number", "name", "volume(7d)", "Sales(7d)", "volume(all time)", "sales all time", "avg price(7d)", "totalSupply", "owners", "owners%", "estimatedMarketCap", "Added"]
+    num = 0
+    for line in i.text.splitlines():
+        if num == 2:
+            for info in line.split(" "):
+                if info == "ETH":
+                    continue
+                onLine.append(info)
+            continue
+        onLine.append(line)
+        num = num + 1
+    dbDataElement = {}
+    for myIndex in range(len(attributes)):
+        dbDataElement[attributes[myIndex]] = onLine[myIndex]
+
+    dbDataElement["link"] = i.find_element_by_tag_name("a").get_attribute('href')
+    dbDataElement["image"] = i.find_element_by_tag_name("img").get_attribute('src')
+    print(dbDataElement)
+    dbData.append(dbDataElement)
+
+collection.insert_many(dbData)
