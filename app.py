@@ -4,6 +4,7 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from pymongo import MongoClient
+from selenium.common.exceptions import NoSuchElementException
 
 app = Flask(__name__)
 
@@ -75,6 +76,7 @@ for i in recent_data[1].find_elements_by_tag_name("tr"):
     if index == 0:
         index = index + 1
         continue
+        # print(i.text)
 
     onLine = []
     attributes = ["number", "name", "volume(7d)", "Sales(7d)", "volume(all time)", "sales all time", "avg price(7d)", "totalSupply", "owners", "owners%", "estimatedMarketCap", "Added"]
@@ -88,6 +90,7 @@ for i in recent_data[1].find_elements_by_tag_name("tr"):
             continue
         onLine.append(line)
         num = num + 1
+        
     dbDataElement = {}
     for myIndex in range(len(attributes)):
         dbDataElement[attributes[myIndex]] = onLine[myIndex]
@@ -96,5 +99,43 @@ for i in recent_data[1].find_elements_by_tag_name("tr"):
     dbDataElement["image"] = i.find_element_by_tag_name("img").get_attribute('src')
     print(dbDataElement)
     dbData.append(dbDataElement)
+        
+for i in range(len(dbData)):
+    print(dbData[i])
+    url = dbData[i]["link"]
+    browser.get(url)
+    time.sleep(10)
+    socialData = browser.find_elements_by_xpath("//div[contains(@class, 'flex flex-row items-center space-x-1 text-sm')]")
+    imgCover = browser.find_elements_by_xpath("//div[contains(@class, 'w-full mb-5 overflow-hidden')]")
+    description = browser.find_elements_by_xpath("//div[contains(@class, 'text-sm text-gray-400 notes')]")
+    nftsElements = browser.find_elements_by_xpath("//div[contains(@class, 'flex flex-row flex-wrap justify-start px-1 py-2 pt-1 ml-4 lg:px-2')]")
+        
+    try:
+        print("IMAGE")
+        print(imgCover[0].find_element_by_tag_name("img").get_attribute('src'))
+        dbData[i]["imgCover"] = imgCover[0].find_element_by_tag_name("img").get_attribute('src')
+
+        print("DESCRIPTION")
+        dbData[i]["description"] = description[0].text
+    except IndexError:
+        pass
+        
+        
+    nfts = []
+    try:
+        print(len(nftsElements[0].find_elements_by_class_name("transition-all")))
+        for nft in nftsElements[0].find_elements_by_class_name("transition-all"):
+            print(nft.find_element_by_tag_name("img"))
+            nfts.append({"img": nft.find_element_by_tag_name("img").get_attribute('src'), "title": nft.find_elements_by_tag_name('a')[2].text})
+            print(len(nfts))
+    except (NoSuchElementException, IndexError) as error:
+        pass
+        
+    dbData[i]["nfts"] = nfts
+        
+
+    for d in socialData:
+        print(d.find_element_by_tag_name("a").get_attribute('href'))
+        dbData[i][d.find_element_by_tag_name("a").text] = d.find_element_by_tag_name("a").get_attribute('href')
 
 collection.insert_many(dbData)
