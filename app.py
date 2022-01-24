@@ -10,7 +10,7 @@ from selenium.common.exceptions import NoSuchElementException
 
 app = Flask(__name__)
 
-cors = CORS(app, resources={r"*": {"origins": "*"}})
+cors = CORS(app, resources={r"*": {"origins": "http://127.0.0.1:4200/"}})
 api = Api(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
@@ -19,11 +19,6 @@ option = webdriver.ChromeOptions()
 option.add_argument("--start-maximized")
 option.add_argument("--incognito")
 option.add_argument('--ignore-certificate-errors')
-
-browser = webdriver.Chrome(executable_path='C:\\Users\\Probook\\Desktop\\Master SIM\\S3\\JEE\\Projet\\chromedriver_win32\\chromedriver', options=option)
-url = 'https://rarity.tools'
-browser.get(url)
-time.sleep(10)
 
 # MongoDb options
 cluster = MongoClient("mongodb+srv://bilalkh:testtest123@cluster0.kdcdr.mongodb.net/myFirstDatabaseretryWrites=true&w=majority")
@@ -38,6 +33,10 @@ dbDataElement = {}
 
 @app.route('/recent-collections' , methods = ['GET'])
 def recent_collections():
+    browser = webdriver.Chrome(executable_path='C:\\Users\\Probook\\Desktop\\Master SIM\\S3\\JEE\\Projet\\chromedriver_win32\\chromedriver', options=option)
+    url = 'https://rarity.tools'
+    browser.get(url)
+    time.sleep(10)
     # More Recent Collections
     recent_data = browser.find_elements(by=By.CLASS_NAME, value='tableHolder')[0]
     for ele in recent_data.find_elements_by_tag_name('a'):
@@ -56,6 +55,10 @@ def recent_collections():
 
 @app.route('/top-collections' , methods = ['GET'])
 def top_collections():
+    browser = webdriver.Chrome(executable_path='C:\\Users\\Probook\\Desktop\\Master SIM\\S3\\JEE\\Projet\\chromedriver_win32\\chromedriver', options=option)
+    url = 'https://rarity.tools'
+    browser.get(url)
+    time.sleep(10)
     # Top Collections
     top_data = browser.find_elements_by_xpath("//div[contains(@class, 'pt-4 pb-3 mt-4 border border-gray-300 rounded-lg shadow-md dark:border-gray-800 bgCard ml-4')]")
     for ele in top_data:
@@ -80,6 +83,10 @@ def top_collections():
 
 @app.route('/all-collections' , methods = ['GET'])
 def all_collections():
+    browser = webdriver.Chrome(executable_path='C:\\Users\\Probook\\Desktop\\Master SIM\\S3\\JEE\\Projet\\chromedriver_win32\\chromedriver', options=option)
+    url = 'https://rarity.tools'
+    browser.get(url)
+    time.sleep(10)
     # All Collections
     recent_data = browser.find_elements(by=By.CLASS_NAME, value='tableHolder')[1]
     for i in recent_data.find_elements_by_tag_name("tr"):
